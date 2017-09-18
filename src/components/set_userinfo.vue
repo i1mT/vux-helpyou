@@ -9,6 +9,7 @@
 		</group>
 		<group>
 			<x-input title="你的地址" v-model="address"  placeholder="要送到的寝室地址"></x-input>
+			<x-input title="你的电话" v-model="tel"  placeholder="在快递单上的电话"></x-input>
 			<x-input title="上传头像" v-model="avatar_file">
 				<div id="uploaderInput" slot="right">
 					<input ref="upload_file" class="weui-uploader__input" v-on:change="upload_file_change" type="file" accept="image/*" multiple />{{ select_avatar }}
@@ -51,6 +52,7 @@ export default {
 			gender: "",
 			true_name: "",
 			address: "",
+			tel: "",
 			avatar_file: "",
 			upload_file: {},
 			select_avatar: "选择头像"
@@ -68,7 +70,8 @@ export default {
 				true_name : this.true_name,
 				gender : this.gender,
 				address : this.address,
-				avatar_file : this.avatar_file
+				avatar_file : this.avatar_file,
+				tel : this.tel
 			}
 			console.log( data )
 		},

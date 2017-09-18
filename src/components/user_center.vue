@@ -11,7 +11,7 @@
 		<tabbar>
 			<tabbar-item :link='route_list'>
 				<img slot="icon" src="../assets/img/list.png">
-				<span slot="label">提交</span>
+				<span slot="label">清单</span>
 			</tabbar-item>
 			<tabbar-item selected :show-dot="showdot" :link="route_user_center">
 				<img slot="icon" src="../assets/img/user.png">

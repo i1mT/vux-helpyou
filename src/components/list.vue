@@ -1,24 +1,24 @@
 <template>
 	<div id="list">
 		<view-box ref="viewBox">
-			<h4>粘贴你的快递短信到这</h4>
+			<h4>粘贴你的快递短信到这 {{ msg }}</h4>
 			<group>
 				<x-textarea v-model="msg_content"></x-textarea>
 				<x-button type="primary" @click.native="submit_msg">确认</x-button>
 			</group>
-			<divider>·</divider>
+			<divider>已提交清单</divider>
 			<form-preview
 				v-for="item in lists"
 				:name="item.id"
-				:header-label="item.date"
-				:header-value="item.time"
+				:header-label="item.time"
+				:header-value="item.date"
 				:body-items="item.desc"
 				:footer-buttons="item.buttons"
 			></form-preview>
 			<tabbar id="bottom">
 				<tabbar-item selected :link='route_list'>
 					<img slot="icon" src="../assets/img/list.png">
-					<span slot="label">提交</span>
+					<span slot="label">清单</span>
 				</tabbar-item>
 				<tabbar-item :show-dot="showdot" :link="route_user_center">
 					<img slot="icon" src="../assets/img/user.png">
@@ -57,93 +57,78 @@ export default {
 	    ViewBox,
 	    Confirm 
 	},
-	data () {
+	mounted() {
 		const get_userinfo_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
 		var userinfo = {},
-			that = this
-		AjaxPlugin.$http.get( get_userinfo_url ).then( ( res ) => {
-			userinfo = res.data 
-			that.userinfo = userinfo
-			that.route_list = "/list/email/" + that.userinfo.email
-			that.route_user_center = "/user_center/email/" + that.userinfo.email
-		})
+			that = this,
+			_email = this.$route.params.email
 
+		AjaxPlugin.$http.get( get_userinfo_url ).then( ( res ) => {
+			userinfo = res.data
+			that.userinfo = userinfo
+			that.route_list = "/list/email/" + _email
+			that.route_user_center = "/user_center/email/" + _email
+			const get_user_list_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_user_list&email=" + _email
+			AjaxPlugin.$http.get( get_user_list_url ).then( ( res ) => {
+				var data = res.data,
+					lists = []
+				console.log(data)
+				for ( var i = 0; i < data.length; i++ ) {
+					var list = {
+						id: data[i].id,
+						date: data[i].time.toString().substr( 11 ),
+						time: data[i].time.toString().substr( 0, 10 ),
+						buttons: [{
+					        style: 'default',
+					        text: '取消',
+					        onButtonClick: ( id ) => {
+								console.log( "取消" + id )
+								this.confirm_text = "确认取消吗"
+								this.show_confirm = true
+							}
+					    },{
+							style: 'primary',
+							text: '确认收到',
+							onButtonClick: ( id ) => {
+								console.log( "确认" + id )
+								this.confirm_text = "确认收到了吗"
+								this.show_confirm = true
+							}
+						}],
+						desc: [{
+							label: "地址",
+							value: userinfo.add
+						},{
+							label: "货架号",
+							value: data[i].shelf_num
+						},{
+							label: "类型",
+							value: data[i].goods_type
+						},{
+							label: "状态",
+							value: data[i].state
+						}]
+					}
+					lists.push( list )
+				}
+				this.lists = lists
+				this.msg = "msg++"
+				console.log( lists )
+			})
+		})
+	},
+	data () {
+
+		//获取用户清单
 		return {
+			msg : "",
 			userinfo : {},
 			showdot : false,
 			route_list: "",
 			route_user_center : "",
 			msg_content: "",
 			//这个lists为模拟数据 真实数据从服务器请求过来
-			lists: [{
-				id: "1",
-				date: "12:52:30",
-				time: "2017.09.18",
-				buttons: [{
-			        style: 'default',
-			        text: '取消',
-			        onButtonClick: ( id ) => {
-						console.log( "取消" + id )
-						this.confirm_text = "确认取消吗"
-						this.show_confirm = true
-					}
-			    },{
-					style: 'primary',
-					text: '确认收到',
-					onButtonClick: ( id ) => {
-						console.log( "确认" + id )
-						this.confirm_text = "确认收到了吗"
-						this.show_confirm = true
-					}
-				}],
-				desc: [{
-					label: "地址",
-					value: "河西"
-				},{
-					label: "货架号",
-					value: "12-5"
-				},{
-					label: "类型",
-					value: "大件"
-				},{
-					label: "状态",
-					value: "待接单"
-				}]
-			},{
-				id: "2",
-				date: "10:16:25",
-				time: "2017.09.18",
-				buttons: [{
-			        style: 'default',
-			        text: '取消',
-			        onButtonClick: ( id ) => {
-						console.log( "取消" + id )
-						this.confirm_text = "确认取消吗"
-						this.show_confirm = true
-					}
-			    },{
-					style: 'primary',
-					text: '确认收到',
-					onButtonClick: ( id ) => {
-						console.log( "确认" + id )
-						this.confirm_text = "确认取消吗"
-						this.show_confirm = true
-					}
-				}],
-				desc: [{
-					label: "地址",
-					value: "西大门"
-				},{
-					label: "货架号",
-					value: "14-1"
-				},{
-					label: "类型",
-					value: "中件"
-				},{
-					label: "状态",
-					value: "√ 已完成"
-				}]
-			}],
+			lists: [],
 			confirm_text: "取消",
 			show_confirm: false
 		}
