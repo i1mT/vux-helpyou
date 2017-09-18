@@ -1,9 +1,14 @@
 <template>
 	<div id="list">
 		<view-box ref="viewBox">
-			<h4>粘贴你的快递短信到这 {{ msg }}</h4>
+			<h4>粘贴你的快递短信到这</h4>
 			<group>
 				<x-textarea v-model="msg_content"></x-textarea>
+			</group>
+			<group title="类别">
+				<radio :options="goods_type_options" @on-change="radio_change"></radio>
+			</group>
+			<group>
 				<x-button type="primary" @click.native="submit_msg">确认</x-button>
 			</group>
 			<divider>已提交清单</divider>
@@ -37,7 +42,7 @@
 </template>
 
 <script>
-import { Group, XInput, Tab, TabItem, XButton, Divider, XHeader, AjaxPlugin, Toast, Tabbar, TabbarItem, XTextarea, FormPreview, ViewBox, Confirm } from 'vux'
+import { Group, XInput, Tab, TabItem, XButton, Divider, XHeader, AjaxPlugin, Toast, Tabbar, TabbarItem, XTextarea, FormPreview, ViewBox, Confirm, Radio } from 'vux'
 
 export default {
 	components: {
@@ -55,7 +60,8 @@ export default {
 	    XTextarea,
 	    FormPreview,
 	    ViewBox,
-	    Confirm 
+	    Confirm,
+	    Radio
 	},
 	mounted() {
 		const get_userinfo_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
@@ -72,13 +78,29 @@ export default {
 			AjaxPlugin.$http.get( get_user_list_url ).then( ( res ) => {
 				var data = res.data,
 					lists = []
-				console.log(data)
-				for ( var i = 0; i < data.length; i++ ) {
+				for ( var i = data.length - 1; i >=0; i-- ) {
 					var list = {
 						id: data[i].id,
 						date: data[i].time.toString().substr( 11 ),
 						time: data[i].time.toString().substr( 0, 10 ),
-						buttons: [{
+						desc: [{
+							label: "取件点",
+							value: data[i].pick_pos
+						},{
+							label: "货架号",
+							value: data[i].shelf_num
+						},{
+							label: "类型",
+							value: data[i].goods_type
+						},{
+							label: "状态",
+							value: data[i].state
+						}]
+					}
+					if ( data[i].state == "已确认") {
+						list.buttons = []
+					}else{
+						list.buttons = [{
 					        style: 'default',
 					        text: '取消',
 					        onButtonClick: ( id ) => {
@@ -94,26 +116,11 @@ export default {
 								this.confirm_text = "确认收到了吗"
 								this.show_confirm = true
 							}
-						}],
-						desc: [{
-							label: "地址",
-							value: userinfo.add
-						},{
-							label: "货架号",
-							value: data[i].shelf_num
-						},{
-							label: "类型",
-							value: data[i].goods_type
-						},{
-							label: "状态",
-							value: data[i].state
 						}]
 					}
 					lists.push( list )
 				}
 				this.lists = lists
-				this.msg = "msg++"
-				console.log( lists )
 			})
 		})
 	},
@@ -121,7 +128,16 @@ export default {
 
 		//获取用户清单
 		return {
-			msg : "",
+			goods_type_options: [{
+				key: '小件',
+				value: "小件"
+			},{
+				key: '中件',
+				value: "中件"
+			},{
+				key: '大件',
+				value: '大件'
+			}],
 			userinfo : {},
 			showdot : false,
 			route_list: "",
@@ -130,19 +146,51 @@ export default {
 			//这个lists为模拟数据 真实数据从服务器请求过来
 			lists: [],
 			confirm_text: "取消",
-			show_confirm: false
+			show_confirm: false,
+			goods_type: ""
 		}
 	},
 	methods: {
 		submit_msg : function ( ) {
 			//解析短信内容
-			console.log( msg_content )
+			var content = this.msg_content,
+				res = {
+					pick_pos: "",
+					shelf_num: "",
+					goods_type: this.goods_type
+				}
+			
+			if ( content.indexOf("文理河西物流服务点") >= 0 ){
+				//是河西快递超市的
+				res.pick_pos = "文理河西物流服务点"
+				var index_start = content.indexOf ( "『" ),
+					index_end = content.indexOf ( "』" ),
+					num = content.substr(index_start+1, index_end - index_start -1 )
+				res.shelf_num = num
+			}else if ( content.indexOf("文理河西西大门") >= 0 ) {
+				res.pick_pos = "文理河西西大门"
+				var index_start = content.indexOf ( "『" ),
+					index_end = content.indexOf ( "』" ),
+					num = content.substr(index_start+1, index_end - index_start - 1 )
+				res.shelf_num = num
+
+			} else if ( content.indexOf("风雅苑车库") >= 0 ) {
+				res.pick_pos = "风雅苑车库"
+				var index_start = content.indexOf ( "[" ),
+					index_end = content.indexOf ( "]" ),
+					num = content.substr(index_start + 1, index_end - index_start - 1 )
+				res.shelf_num = num
+			}
+			console.log(res)
 		},
 		onCancel: function () {
 			console.log("取消了")
 		},
 		onConfirm: function () {
 			console.log("确认了")
+		},
+		radio_change: function ( val ) {
+			this.goods_type = val
 		}
 	}
 }
