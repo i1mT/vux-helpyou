@@ -1,6 +1,6 @@
-# y
+# Helpyou
 
-> A Vue.js project
+> 使用Vue + vux 搭建的帮拿快递应用
 
 ## Build Setup
 
