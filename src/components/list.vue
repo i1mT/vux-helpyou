@@ -114,17 +114,7 @@ export default {
 								this.cur_operate_id = id
 								this.opreate_type = "cancle"
 							}
-					    },{
-							style: 'primary',
-							text: '确认收到',
-							onButtonClick: ( id ) => {
-								console.log( "确认" + id )
-								this.confirm_text = "确认收到了吗"
-								this.show_confirm = true
-								this.cur_operate_id = id
-								this.opreate_type = "confirm"
-							}
-						}]
+					    }]
 					}
 					lists.push( list )
 				}
@@ -194,6 +184,9 @@ export default {
 					index_end = content.indexOf ( "]" ),
 					num = content.substr(index_start + 1, index_end - index_start - 1 )
 				res.shelf_num = num
+			}else{
+				res.pick_pos = "其他"
+				res.shelf_num = this.msg_content
 			}
 			
 			const add_list_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=add_list&uid="+res.uid+"&shelf_num="+res.shelf_num+"&goods_type="+res.goods_type+"&state="+res.state+"&pick_pos="+res.pick_pos

@@ -12,6 +12,7 @@ import index from './components/index'
 import list from './components/list'
 import user_center from './components/user_center'
 import set_userinfo from './components/set_userinfo'
+import admin from './components/tfhhh'
 
 Vue.use(VueRouter)
 Vue.use(AjaxPlugin)
@@ -45,6 +46,9 @@ const routes = [
 		path: '/set_userinfo/email/:email',
 		name: "set_userinfo",
 		component: set_userinfo
+	},{
+		path: '/tfhhh',
+		component: admin
 	}
 ]
 
