@@ -31,6 +31,7 @@
 				</tabbar-item>
 			</tabbar>
 		</view-box>
+		<toast v-model="toast_show" :type="toast_type">{{ add_list_result }}</toast>
 		<confirm v-model="show_confirm"
 	      :title="confirm_text"
 	      @on-cancel="onCancel"
@@ -147,7 +148,10 @@ export default {
 			lists: [],
 			confirm_text: "取消",
 			show_confirm: false,
-			goods_type: ""
+			goods_type: "",
+			toast_show: false,
+			add_list_result: "成功",
+			toast_type: "success"
 		}
 	},
 	methods: {
@@ -155,6 +159,8 @@ export default {
 			//解析短信内容
 			var content = this.msg_content,
 				res = {
+					uid: this.userinfo.id,
+					state: "待接单",
 					pick_pos: "",
 					shelf_num: "",
 					goods_type: this.goods_type
@@ -181,7 +187,21 @@ export default {
 					num = content.substr(index_start + 1, index_end - index_start - 1 )
 				res.shelf_num = num
 			}
-			console.log(res)
+			
+			const add_list_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=add_list&uid="+res.uid+"&shelf_num="+res.shelf_num+"&goods_type="+res.goods_type+"&state="+res.state+"&pick_pos="+res.pick_pos
+			AjaxPlugin.$http.get( add_list_url ).then( ( res ) => {
+				if( res ) {
+					this.toast_show = true
+					this.toast_type = "success"
+					setTimeout(function () {
+						location.reload()
+					}, 1500 )
+				}else{
+					this.add_list_result = "添加失败\n请检查网络或反馈信息给开发者"
+					this.toast_type = "cancel"
+					this.toast_show = true
+				}
+			})
 		},
 		onCancel: function () {
 			console.log("取消了")

@@ -67,6 +67,7 @@ export default {
 		},
 		submit: function () {
 			var data = {
+				email: this.$route.params.email,
 				true_name : this.true_name,
 				gender : this.gender,
 				address : this.address,
@@ -74,6 +75,10 @@ export default {
 				tel : this.tel
 			}
 			console.log( data )
+			const url = "http://localhost/helpyou-server/sql_class/set_user_info.php"
+			AjaxPlugin.$http.post( url, data ).then( (res) => {
+				console.log( res )
+			})
 		},
 		change: function ( value ) {
 			console.log( value )
