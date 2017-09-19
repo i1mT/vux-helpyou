@@ -31,7 +31,7 @@
 				</tabbar-item>
 			</tabbar>
 		</view-box>
-		<toast v-model="toast_show" :type="toast_type">{{ add_list_result }}</toast>
+		<toast v-model="toast_show" :type="toast_type">{{ toast_content }}</toast>
 		<confirm v-model="show_confirm"
 	      :title="confirm_text"
 	      @on-cancel="onCancel"
@@ -65,6 +65,9 @@ export default {
 	    Radio
 	},
 	mounted() {
+		if( window.localStorage.islogin == "false" ){
+			this.$router.push("/login")
+		}
 		const get_userinfo_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
 		var userinfo = {},
 			that = this,
@@ -98,16 +101,18 @@ export default {
 							value: data[i].state
 						}]
 					}
-					if ( data[i].state == "已确认") {
+					if ( data[i].state == "已确认" || data[i].state=="已取消") {
 						list.buttons = []
 					}else{
 						list.buttons = [{
 					        style: 'default',
-					        text: '取消',
+					        text: '取消代取',
 					        onButtonClick: ( id ) => {
 								console.log( "取消" + id )
 								this.confirm_text = "确认取消吗"
 								this.show_confirm = true
+								this.cur_operate_id = id
+								this.opreate_type = "cancle"
 							}
 					    },{
 							style: 'primary',
@@ -116,6 +121,8 @@ export default {
 								console.log( "确认" + id )
 								this.confirm_text = "确认收到了吗"
 								this.show_confirm = true
+								this.cur_operate_id = id
+								this.opreate_type = "confirm"
 							}
 						}]
 					}
@@ -150,8 +157,9 @@ export default {
 			show_confirm: false,
 			goods_type: "",
 			toast_show: false,
-			add_list_result: "成功",
-			toast_type: "success"
+			toast_content: "成功",
+			toast_type: "success",
+			cur_operate_id: "",
 		}
 	},
 	methods: {
@@ -161,8 +169,8 @@ export default {
 				res = {
 					uid: this.userinfo.id,
 					state: "待接单",
-					pick_pos: "",
-					shelf_num: "",
+					pick_pos: "未识别",
+					shelf_num: "未识别",
 					goods_type: this.goods_type
 				}
 			
@@ -207,7 +215,30 @@ export default {
 			console.log("取消了")
 		},
 		onConfirm: function () {
-			console.log("确认了")
+			console.log( this.opreate_type, this.cur_operate_id )
+			var state = ""
+			if ( this.opreate_type=="confirm" )
+				state = "已确认"
+			else
+				state = "已取消"
+			
+			const url = "http://localhost/helpyou-server/sql_class/set_list_state.php?id="+this.cur_operate_id+"&state="+state
+
+			AjaxPlugin.$http.get( url ).then( ( res ) => {
+				if( res.data ){
+					this.toast_show = true
+					this.toast_type = "success"
+					this.toast_content = "操作成功"
+					setTimeout(function () {
+						location.reload()
+					}, 1500 )
+					
+				}else{
+					this.toast_show = true
+					this.toast_type = "cancle"
+					this.toast_content = "操作失败"
+				}
+			})
 		},
 		radio_change: function ( val ) {
 			this.goods_type = val

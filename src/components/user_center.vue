@@ -2,12 +2,21 @@
 	<div id="user_center">
 		<div class="vux-demo">
 			<img class="logo" src="../assets/vux_logo.png">
-			<p> {{ userinfo.username }}</p>
+			<p class="username"> {{ userinfo.name }}</p>
+			<p> <span class="gender">{{ gender_name }}</span><span class="tel">{{ tel }}</span> </p>
+			<p class="add">{{ add }}</p>
     	</div>
-    	<divider>·</divider>
+    	<divider class="divider">·</divider>
     	<group>
     		<cell title="设置个人信息" is-link @click.native="set_userinfo"></cell>
+    		<cell title="退出" @click.native="logout"></cell>
     	</group>
+		<div class="pay">
+			<img class="qrcode" src="../assets/weichat-pay.png">
+			<p>长按微信支付</p>
+			<p class="add">支付宝账号：18857516463</p>
+			<p class="add">Bug提交：QQ1298793121</p>
+    	</div>
 		<tabbar>
 			<tabbar-item :link='route_list'>
 				<img slot="icon" src="../assets/img/list.png">
@@ -22,7 +31,7 @@
 </template>
 
 <script>
-import { Group, XInput, Tab, TabItem, XButton, Divider, XHeader, AjaxPlugin, Toast, Tabbar, TabbarItem, Cell } from 'vux'
+import { Group, XInput, Tab, TabItem, XButton, Divider, XHeader, AjaxPlugin, Toast, Tabbar, TabbarItem, Cell, Qrcode  } from 'vux'
 
 export default {
 	components: {
@@ -37,9 +46,14 @@ export default {
 	    Toast,
 	    Tabbar,
 	    TabbarItem,
-	    Cell
+	    Cell,
+	    Qrcode
 	},
 	data () {
+		if( window.localStorage.islogin == "false" ){
+			this.$router.push("/login")
+		}
+
 		const get_userinfo_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
 		var userinfo = {},
 			that = this
@@ -48,12 +62,18 @@ export default {
 			that.userinfo = userinfo
 			that.route_list = "/list/email/" + that.userinfo.email
 			that.route_user_center = "/user_center/email/" + that.userinfo.email
+			that.gender_name = userinfo.gender? "男":"女"
+			that.tel = userinfo.tel
+			that.add = userinfo.add
 		})
 		return {
 			showdot: false,
 			route_list: "",
 			route_user_center : "",
-			userinfo: {}
+			userinfo: {},
+			gender_name: "",
+			tel: "",
+			add: ""
 		}
 	},
 	methods: {
@@ -64,6 +84,11 @@ export default {
 					email: this.userinfo.email
 				}
 			})
+		},
+		logout: function () {
+			window.localStorage.islogin = false
+			console.log("退出")
+			this.$router.push("/login")
 		}
 	}
 }
@@ -72,11 +97,43 @@ export default {
 <style>
 .vux-demo {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 5px;
 }
 .logo {
   width: 100px;
   height: 100px;
   border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0px 0px 5px 0px #999;
+}
+.divider {
+	padding: 0;
+}
+.pay {
+	text-align: center;
+	margin-top: 5px;
+}
+.qrcode {
+	width: 100px;
+	height: 100px;
+}
+.vux-demo .username {
+	font-size: 20px;
+}
+.vux-demo p{
+}
+.gender {
+	font-size: 15px;
+	margin-right: 10px;
+	color: #87CEFF;
+	font-weight: bold;
+}
+.tel {
+	font-size: 15px;
+	color: #757575;
+}
+.add {
+	font-size: 14px;
+	color: #757575;
 }
 </style>

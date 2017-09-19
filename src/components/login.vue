@@ -48,6 +48,7 @@ export default {
 				state = res.data
 				if(!state) this.toast_show = true
 				else{
+					window.localStorage.islogin = true
 					this.$router.push("/list/email/" + email)
 				}
 			})
