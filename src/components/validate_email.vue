@@ -36,7 +36,7 @@ export default {
 	    Toast
 	},
 	mounted () {
-		const send_email_url = 'http://localhost/helpyou-server/mail-server/sendMail.php?email='+this.$route.params.email+"&psw=tfhhh"
+		const send_email_url = 'http://www.iimt.me/helpyou-server/mail-server/sendMail.php?email='+this.$route.params.email+"&psw=tfhhh"
 		AjaxPlugin.$http.get(send_email_url).then( (res) => {
 			this.$route.params.code = res.data.toString().trim()
 			this.$refs.load.$el.style.display='none'
@@ -51,7 +51,7 @@ export default {
 			buttons: [{
 		        type: 'primary',
 		        text: '去登陆',
-		        link: "/login"
+		        link: "/"
 		    }],
 		    valid_show_state: true,
 		    msg_show_state: false,
@@ -69,7 +69,7 @@ export default {
 				const username = this.$route.params.username,
 					  password = this.$route.params.password,
 					  email = this.$route.params.email
-				const url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=add_user&username="+username+"&password="+password+"&email="+email
+				const url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=add_user&username="+username+"&password="+password+"&email="+email
 				AjaxPlugin.$http.get( url ).then( (res) => {
 					console.log(res.data)
 				})
@@ -87,7 +87,7 @@ export default {
 		},
 		resend: function () {
 			this.$refs.load.$el.style.display = 'table-column-group'
-			const send_email_url = 'http://localhost/helpyou-server/mail-server/sendMail.php?email='+this.$route.params.email+"&psw=tfhhh"
+			const send_email_url = 'http://www.iimt.me/helpyou-server/mail-server/sendMail.php?email='+this.$route.params.email+"&psw=tfhhh"
 			AjaxPlugin.$http.get(send_email_url).then( (res) => {
 				this.$route.params.code = res.data.toString().trim()
 				this.$refs.load.$el.style.display='none'

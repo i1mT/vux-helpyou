@@ -66,19 +66,18 @@ export default {
 	},
 	mounted() {
 		if( window.localStorage.islogin == "false" ){
-			this.$router.push("/login")
+			this.$router.push("/")
 		}
-		const get_userinfo_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
+		const get_userinfo_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
 		var userinfo = {},
 			that = this,
 			_email = this.$route.params.email
 
 		AjaxPlugin.$http.get( get_userinfo_url ).then( ( res ) => {
 			userinfo = res.data
-			that.userinfo = userinfo
-			that.route_list = "/list/email/" + _email
-			that.route_user_center = "/user_center/email/" + _email
-			const get_user_list_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_user_list&email=" + _email
+			console.log( userinfo )
+			_email = userinfo.email
+			const get_user_list_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=get_user_list&email=" + _email
 			AjaxPlugin.$http.get( get_user_list_url ).then( ( res ) => {
 				var data = res.data,
 					lists = []
@@ -120,6 +119,19 @@ export default {
 				}
 				this.lists = lists
 			})
+			this.userinfo = userinfo
+			this.route_list = "/list/email/" + _email
+			this.route_user_center = "/user_center/email/" + _email
+			//判断用户信息是否设置
+			if(!userinfo.name || !userinfo.add || !userinfo.tel){
+				this.toast_content = "请先设置个人信息"
+				this.toast_type = "warn"
+				this.toast_show = true
+				var that = this
+				setTimeout(function () {
+					that.$router.push("/set_userinfo/email/"+that.userinfo.email)
+				}, 1000 )
+			}
 		})
 	},
 	data () {
@@ -189,7 +201,7 @@ export default {
 				res.shelf_num = this.msg_content
 			}
 			
-			const add_list_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=add_list&uid="+res.uid+"&shelf_num="+res.shelf_num+"&goods_type="+res.goods_type+"&state="+res.state+"&pick_pos="+res.pick_pos
+			const add_list_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=add_list&uid="+res.uid+"&shelf_num="+res.shelf_num+"&goods_type="+res.goods_type+"&state="+res.state+"&pick_pos="+res.pick_pos
 			AjaxPlugin.$http.get( add_list_url ).then( ( res ) => {
 				if( res ) {
 					this.toast_show = true
@@ -215,7 +227,7 @@ export default {
 			else
 				state = "已取消"
 			
-			const url = "http://localhost/helpyou-server/sql_class/set_list_state.php?id="+this.cur_operate_id+"&state="+state
+			const url = "http://www.iimt.me/helpyou-server/sql_class/set_list_state.php?id="+this.cur_operate_id+"&state="+state
 
 			AjaxPlugin.$http.get( url ).then( ( res ) => {
 				if( res.data ){

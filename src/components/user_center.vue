@@ -14,8 +14,8 @@
 		<div class="pay">
 			<img class="qrcode" src="../assets/weichat-pay.png">
 			<p>长按微信支付</p>
-			<p class="add">支付宝账号：18857516463</p>
-			<p class="add">Bug提交：QQ1298793121</p>
+			<p class="add">支付宝账号：17306566375</p>
+			<p class="add">其他问题：QQ1298793121</p>
     	</div>
 		<tabbar>
 			<tabbar-item :link='route_list'>
@@ -51,10 +51,10 @@ export default {
 	},
 	data () {
 		if( window.localStorage.islogin == "false" ){
-			this.$router.push("/login")
+			this.$router.push("/")
 		}
 
-		const get_userinfo_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
+		const get_userinfo_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
 		var userinfo = {},
 			that = this
 		AjaxPlugin.$http.get( get_userinfo_url ).then( ( res ) => {
@@ -88,7 +88,7 @@ export default {
 		logout: function () {
 			window.localStorage.islogin = false
 			console.log("退出")
-			this.$router.push("/login")
+			this.$router.push("/")
 		}
 	}
 }

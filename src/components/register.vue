@@ -1,17 +1,16 @@
 <template>
   <div id="register">
-    <x-header :left-options="{showBack: false}">{{ msg }}</x-header>
+    <x-header>{{ msg }}</x-header>
     <div class="vux-demo">
       <img class="logo" src="../assets/vux_logo.png">
       <p>请先填写注册信息</p>
     </div>
     <group class='tab-0'>
-      <x-input title="用户名" v-model="username" ref="username" :is-type="is_en" placeholder="字母数字下划线" max=10 ></x-input>
-      <x-input title="密码" v-model="password" placeholder="请输入密码" type="password" label-width="68px"></x-input>
-      <x-input title="邮箱" v-model="email" ref="email" placeholder="请输入邮箱" is-type="email" label-width="68px"></x-input>
+      <x-input title="学号" v-model="username" ref="username" :is-type="is_en" placeholder="输入你的学号" max=10 ></x-input>
+      <x-input title="密码" v-model="password" placeholder="请输入密码" type="password"></x-input>
+      <x-input title="邮箱" v-model="email" ref="email" placeholder="请输入邮箱" is-type="email"></x-input>
       <divider></divider>
       <x-button type="primary" :disabled="is_inrule" @click.native="register">注册</x-button>
-      <x-button link="/login">已有账号</x-button> 
     </group>
     <toast v-model="toast_show" type="cancel">邮箱已被使用</toast>
   </div>
@@ -67,16 +66,18 @@ export default {
     },
     register: function () {
       var state
-      const url = "http://localhost/helpyou-server/sql_class/is_email_repeat.php?email=" + this.email
+      const url = "http://www.iimt.me/helpyou-server/sql_class/is_email_repeat.php?email=" + this.email
       AjaxPlugin.$http.get(url).then( (res) => {
         console.log(res.data)
         state = res.data? true:false
         this.toast_show = state
+        if( !state )
+          this.$router.push(this.link_url)
+        else{
+          this.email = ""
+          this.toast_show = true
+        }
       })
-      if( !state )
-        this.$router.push(this.link_url)
-      else
-        this.email = ""
     }
   },
   watch: {

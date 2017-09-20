@@ -37,7 +37,7 @@ export default {
 	    Radio
 	},
 	data () {
-		const get_userinfo_url = "http://localhost/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
+		const get_userinfo_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
 		var userinfo = {},
 			that = this,
 			_email = this.$route.params.email
@@ -81,7 +81,7 @@ export default {
 			}
 			this.show_load = true
 			var that = this
-			const url = "http://localhost/helpyou-server/sql_class/set_user_info.php?email="+data.email+"&true_name="+data.true_name+"&gender="+data.gender+"&tel="+data.tel+"&address="+data.address
+			const url = "http://www.iimt.me/helpyou-server/sql_class/set_user_info.php?email="+data.email+"&true_name="+data.true_name+"&gender="+data.gender+"&tel="+data.tel+"&address="+data.address
 			AjaxPlugin.$http.get( url ).then( (res) => {
 				console.log( res.data )
 				that.show_load = false

@@ -2,13 +2,13 @@
 	<div id="tfhhh">
 		<div class="checker">
 			<checker v-model="pos" default-item-class="selecte" selected-item-class="selecte-selected">
-				<checker-item value="1">西大门</checker-item>
-				<checker-item value="2">河西</checker-item>
-				<checker-item value="3">风雅苑</checker-item>
-				<checker-item value="4">其他</checker-item>
+				<checker-item value="1">西大门({{ pos_num.a }})</checker-item>
+				<checker-item value="2">河西菜鸟({{ pos_num.b }})</checker-item>
+				<checker-item value="3">风雅苑({{ pos_num.c }})</checker-item>
+				<checker-item value="4">其他({{ pos_num.d }})</checker-item>
 		     </checker>
 		</div>
-		<divider>·</divider>
+		<divider @click.native="refresh_page">点击刷新</divider>
 		<view-box ref="viewBox">
 			<form-preview
 					v-for="item in lists"
@@ -24,6 +24,10 @@
 			<tabbar-item selected class="tab">
 				<img slot="icon" src="../assets/img/list.png">
 				<span slot="label">管理端</span>
+			</tabbar-item>
+			<tabbar-item class="tab" link="/count">
+				<img slot="icon" src="../assets/img/list.png">
+				<span slot="label">统计</span>
 			</tabbar-item>
 		</tabbar>
 		<confirm v-model="confirm_show"
@@ -60,12 +64,23 @@ export default {
 	    Confirm
 	},
 	data () {
-		const get_data_url = "http://localhost/helpyou-server/sql_class/get_admin_info.php"
+		const get_data_url = "http://www.iimt.me/helpyou-server/sql_class/get_admin_info.php"
+		var data = {},
+			lists = [],
+			pos_num = {a:0,b:0,c:0,d:0}
+
 		AjaxPlugin.$http.get( get_data_url ).then( ( res ) => {
-			console.log( res.data )
-			var data = res.data,
-				lists = []
+			data = res.data
 			for ( var i = data.length - 1; i >=0; i-- ) {
+					if (data[i].pick_pos=="文理河西物流服务点")
+						pos_num.b++
+					else if ( data[i].pick_pos=="文理河西西大门" )
+						pos_num.a++
+					else if ( data[i].pick_pos=="风雅苑车库" )
+						pos_num.c++
+					else if ( data[i].pick_pos=="其他" )
+						pos_num.d++
+
 				var list = {
 					id: data[i].id,
 					date: data[i].time.toString().substr( 11 ),
@@ -106,6 +121,7 @@ export default {
 				lists.push( list )
 			}
 			this.lists = lists
+			this.pos_num = pos_num
 		})
 		return {
 			lists: [],
@@ -114,7 +130,8 @@ export default {
 			confirm_text: "确认送到了吗？",
 			operate_id: "",
 			toast_show: false,
-			toast_content: ""
+			toast_content: "",
+			pos_num: {}
 		}
 	},
 	methods: {
@@ -122,7 +139,7 @@ export default {
 			console.log("取消了")
 		},
 		onConfirm: function () {
-			const url = "http://localhost/helpyou-server/sql_class/set_list_state.php?id="+this.operate_id+"&state=已确认"
+			const url = "http://www.iimt.me/helpyou-server/sql_class/set_list_state.php?id="+this.operate_id+"&state=已确认"
 			AjaxPlugin.$http.get( url ).then( ( res ) => {
 				if( res.data ){
 					this.toast_show = true
@@ -138,6 +155,9 @@ export default {
 					this.toast_content = "操作失败"
 				}
 			})
+		},
+		refresh_page: function () {
+			location.reload()
 		}
 	},
 	watch: {
@@ -178,7 +198,7 @@ export default {
 }
 .selecte {
   border: 1px solid #ececec;
-  padding: 5px 15px;
+  padding: 3px 15px;
 }
 .selecte-selected {
   border: 1px solid green;
