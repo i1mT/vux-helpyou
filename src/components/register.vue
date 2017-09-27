@@ -7,7 +7,7 @@
     </div>
     <group class='tab-0'>
       <x-input title="学号" v-model="username" ref="username" :is-type="is_en" placeholder="输入你的学号" max=10 ></x-input>
-      <x-input title="密码" v-model="password" placeholder="请输入密码" type="password"></x-input>
+      <x-input title="密码" v-model="password" placeholder="密码简单点就行" type="password"></x-input>
       <x-input title="邮箱" v-model="email" ref="email" placeholder="请输入邮箱" is-type="email"></x-input>
       <divider></divider>
       <x-button type="primary" :disabled="is_inrule" @click.native="register">注册</x-button>

@@ -140,13 +140,13 @@ export default {
 		return {
 			goods_type_options: [{
 				key: '小件',
-				value: "小件"
+				value: "小件  (1元)"
 			},{
 				key: '中件',
-				value: "中件"
+				value: "中件  (1.5元)"
 			},{
 				key: '大件',
-				value: '大件'
+				value: '大件  (2元)'
 			}],
 			userinfo : {},
 			showdot : false,
@@ -166,51 +166,22 @@ export default {
 	},
 	methods: {
 		submit_msg : function ( ) {
+			if( !this.msg_content.length ) return;
 			//解析短信内容
-			var content = this.msg_content,
-				res = {
-					uid: this.userinfo.id,
-					state: "待接单",
-					pick_pos: "未识别",
-					shelf_num: "未识别",
-					goods_type: this.goods_type
-				}
 			
-			if ( content.indexOf("文理河西物流服务点") >= 0 ){
-				//是河西快递超市的
-				res.pick_pos = "文理河西物流服务点"
-				var index_start = content.indexOf ( "『" ),
-					index_end = content.indexOf ( "』" ),
-					num = content.substr(index_start+1, index_end - index_start -1 )
-				res.shelf_num = num
-			}else if ( content.indexOf("文理河西西大门") >= 0 ) {
-				res.pick_pos = "文理河西西大门"
-				var index_start = content.indexOf ( "『" ),
-					index_end = content.indexOf ( "』" ),
-					num = content.substr(index_start+1, index_end - index_start - 1 )
-				res.shelf_num = num
+			const add_list_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=add_list&uid="+this.userinfo.id+"&goods_type="+this.goods_type,
+				msg_content = this.msg_content
 
-			} else if ( content.indexOf("风雅苑车库") >= 0 ) {
-				res.pick_pos = "风雅苑车库"
-				var index_start = content.indexOf ( "[" ),
-					index_end = content.indexOf ( "]" ),
-					num = content.substr(index_start + 1, index_end - index_start - 1 )
-				res.shelf_num = num
-			}else{
-				res.pick_pos = "其他"
-				res.shelf_num = this.msg_content
-			}
-			
-			const add_list_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=add_list&uid="+res.uid+"&shelf_num="+res.shelf_num+"&goods_type="+res.goods_type+"&state="+res.state+"&pick_pos="+res.pick_pos
-			AjaxPlugin.$http.get( add_list_url ).then( ( res ) => {
-				if( res ) {
-					this.toast_show = true
+			AjaxPlugin.$http.post( add_list_url, {msg_content: msg_content}, {headers:{'Content-Type': 'application/x-www-form-urlencoded'}} ).then( ( res ) => {
+				if( res.data ) {
+					this.toast_content = "成功"
 					this.toast_type = "success"
+					this.toast_show = true
 					setTimeout(function () {
 						location.reload()
 					}, 1500 )
 				}else{
-					this.add_list_result = "添加失败\n请检查网络或反馈信息给开发者"
+					this.toast_content = "添加失败\n请检查网络或反馈信息给开发者"
 					this.toast_type = "cancel"
 					this.toast_show = true
 				}

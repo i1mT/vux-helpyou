@@ -35,7 +35,7 @@
 	      @on-cancel="onCancel"
 	      @on-confirm="onConfirm"
 	    >     
-	    	<p style="text-align:center;">三思啊</p>
+	    	<p style="text-align:center;">{{ toast_con }}</p>
       	</confirm>
       	<toast v-model="toast_show">{{ toast_content }}</toast>
 	</div>
@@ -67,19 +67,23 @@ export default {
 		const get_data_url = "http://www.iimt.me/helpyou-server/sql_class/get_admin_info.php"
 		var data = {},
 			lists = [],
-			pos_num = {a:0,b:0,c:0,d:0}
+			pos_num = {a:0,b:0,c:0,d:0},
+			msg_contents = {}
 
 		AjaxPlugin.$http.get( get_data_url ).then( ( res ) => {
 			data = res.data
+			console.log(data)
 			for ( var i = data.length - 1; i >=0; i-- ) {
-					if (data[i].pick_pos=="文理河西物流服务点")
-						pos_num.b++
-					else if ( data[i].pick_pos=="文理河西西大门" )
-						pos_num.a++
-					else if ( data[i].pick_pos=="风雅苑车库" )
-						pos_num.c++
-					else if ( data[i].pick_pos=="其他" )
-						pos_num.d++
+				if (data[i].pick_pos=="文理河西物流服务点")
+					pos_num.b++
+				else if ( data[i].pick_pos=="文理河西西大门" )
+					pos_num.a++
+				else if ( data[i].pick_pos=="风雅苑车库" )
+					pos_num.c++
+				else if ( data[i].pick_pos=="其他" )
+					pos_num.d++
+
+				msg_contents[data[i].id] = data[i].msg_content
 
 				var list = {
 					id: data[i].id,
@@ -111,7 +115,20 @@ export default {
 				        style: 'primary',
 				        text: '确认送到',
 				        onButtonClick: ( id ) => {
-							console.log( "确认" + id )
+							this.confirm_text = "确认送到了吗？"
+							this.toast_operate = true
+							this.toast_con = "三思啊"
+							this.confirm_show = true
+							this.operate_id = id
+						}
+				    },{
+				    	style: 'primary',
+				        text: '查看短信内容',
+				        onButtonClick: ( id ) => {
+
+							this.confirm_text = "短信内容"
+							this.toast_con = this.msg_contents[id]
+							this.toast_operate = false
 							this.confirm_show = true
 							this.operate_id = id
 						}
@@ -120,6 +137,7 @@ export default {
 				}
 				lists.push( list )
 			}
+			this.msg_contents = msg_contents
 			this.lists = lists
 			this.pos_num = pos_num
 		})
@@ -131,7 +149,10 @@ export default {
 			operate_id: "",
 			toast_show: false,
 			toast_content: "",
-			pos_num: {}
+			pos_num: {},
+			toast_operate: true,
+			toast_con: "三思啊",
+			msg_contents: {}
 		}
 	},
 	methods: {
@@ -139,6 +160,7 @@ export default {
 			console.log("取消了")
 		},
 		onConfirm: function () {
+			if (!this.toast_operate ) return;
 			const url = "http://www.iimt.me/helpyou-server/sql_class/set_list_state.php?id="+this.operate_id+"&state=已确认"
 			AjaxPlugin.$http.get( url ).then( ( res ) => {
 				if( res.data ){
@@ -165,7 +187,7 @@ export default {
 			var pos = ""
 			switch ( val ) {
 				case "1":
-					pos = "西大门对面"
+					pos = "文理河西西大门"
 					break;
 				case "2":
 					pos = "文理河西物流服务点"
