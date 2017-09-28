@@ -14,6 +14,7 @@ import user_center from './components/user_center'
 import set_userinfo from './components/set_userinfo'
 import admin from './components/tfhhh'
 import count from './components/count'
+import test from './components/test'
 
 Vue.use(VueRouter)
 Vue.use(AjaxPlugin)
@@ -44,7 +45,7 @@ const routes = [
 		component: user_center
 	},
 	{
-		path: '/set_userinfo/email/:email',
+		path: '/set_userinfo/userinfo/:userinfo',
 		name: "set_userinfo",
 		component: set_userinfo
 	},{
@@ -53,6 +54,10 @@ const routes = [
 	},{
 		path: '/count',
 		component: count
+	},
+	{
+		path: '/test',
+		component: test
 	}
 ]
 

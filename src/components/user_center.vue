@@ -81,7 +81,7 @@ export default {
 			this.$router.push({
 				name: "set_userinfo",
 				params: {
-					email: this.userinfo.email
+					userinfo: this.userinfo
 				}
 			})
 		},

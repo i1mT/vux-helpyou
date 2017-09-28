@@ -10,6 +10,11 @@
 		<group>
 			<x-input title="你的地址" v-model="address"  placeholder="要送到的寝室地址">{{ address }}</x-input>
 			<x-input title="你的电话" v-model="tel"  placeholder="在快递单上的电话">{{ tel }}</x-input>
+			<x-input title="饭卡照片" v-model="pic" :placeholder="file_input_state">
+				<a slot="right" id="uploaderInput">
+					<input type="file" ref="files" v-on:change="file_change" accept="image/*" multiple>{{ file_state }}
+				</a>
+			</x-input>
 		</group>
 		<group>
 			<x-button type="primary" @click.native="submit" :show-loading="show_load">确认</x-button>
@@ -37,7 +42,7 @@ export default {
 	    Radio
 	},
 	data () {
-		const get_userinfo_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.email
+		const get_userinfo_url = "http://www.iimt.me/helpyou-server/sql_class/user_operation.php?method=get_userinfo_by_email&email=" + this.$route.params.userinfo.email
 		var userinfo = {},
 			that = this,
 			_email = this.$route.params.email
@@ -48,6 +53,11 @@ export default {
 			that.tel = userinfo.tel
 			that.address = userinfo.add
 			that.gender = userinfo.gender
+			//判断身份照片
+			if( userinfo.valid_pic ){
+				that.file_input_state = "已上传√"
+				that.file_state = "更换图片"
+			}
 		})
 		return {
 			genders: [ {
@@ -67,7 +77,10 @@ export default {
 			show_load: false,
 			toast_type: "success",
 			toast_show: false,
-			toast_content: "更新成功"
+			toast_content: "更新成功",
+			pic: "",
+			file_state: "选择文件",
+			file_input_state: "未上传"
 		}
 	},
 	methods: {
@@ -91,9 +104,23 @@ export default {
 				}
 				that.toast_show = true
 			})
+			//上传身份照片
+			console.log("上传照片")
+			var files = this.$refs.files.files[0]
+			var form = new FormData()
+			form.append("file",files)
+			let id = this.$route.params.userinfo.stu_id
+			let upload_url = "http://www.iimt.me/helpyou-server/functions/upload_pic.php?id=" + id
+			AjaxPlugin.$http.post(upload_url, form).then( (res) => {
+				console.log(res.data)
+			})
 		},
 		change: function ( val ) {
 			this.gender = val
+		},
+		file_change: function () {
+			this.file_input_state = "已选择"
+			this.file_state = "更换图片"
 		}
 	}
 }
@@ -106,7 +133,7 @@ export default {
 	background-color: #1AAD19;
 	line-height: 1;
     font-size: 13px;
-    padding: 0 1.32em;
+    padding: 0.2em 1.1em;
     text-align: center;
     border-radius: 5px;
     color: #fff;
