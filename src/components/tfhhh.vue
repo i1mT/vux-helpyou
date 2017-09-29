@@ -38,11 +38,22 @@
 	    	<p style="text-align:center;">{{ toast_con }}</p>
       	</confirm>
       	<toast v-model="toast_show">{{ toast_content }}</toast>
+      	<div v-transfer-dom>
+			<x-dialog v-model="pic_show" class="dialog-demo">
+				<div class="img-box">
+					<img :src="valid_pic" style="max-width:100%">
+				</div>
+				<div @click="pic_show=false">
+					<span class="vux-close">关闭</span>
+				</div>
+			</x-dialog>
+		</div>
 	</div>
 </template>
 
 <script>
-import { Group, XInput, Tab, TabItem, XButton, Divider, XHeader, AjaxPlugin, Toast, Tabbar, TabbarItem, ViewBox,Checker,CheckerItem,FormPreview,Confirm } from 'vux'
+import { Group, XInput, Tab, TabItem, XButton, Divider, XHeader, AjaxPlugin, Toast, Tabbar, TabbarItem, ViewBox,Checker,CheckerItem,FormPreview,Confirm,XDialog,
+	TransferDomDirective as TransferDom } from 'vux'
 
 export default {
 	components: {
@@ -61,14 +72,19 @@ export default {
 	    Checker,
 	    CheckerItem,
 	    FormPreview,
-	    Confirm
+	    Confirm,
+	    XDialog
+	},
+	directives: {
+	    TransferDom
 	},
 	data () {
 		const get_data_url = "http://www.iimt.me/helpyou-server/sql_class/get_admin_info.php"
 		var data = {},
 			lists = [],
 			pos_num = {a:0,b:0,c:0,d:0},
-			msg_contents = {}
+			msg_contents = {},
+			valid_pics = {}
 
 		AjaxPlugin.$http.get( get_data_url ).then( ( res ) => {
 			data = res.data
@@ -84,6 +100,7 @@ export default {
 					pos_num.d++
 
 				msg_contents[data[i].id] = data[i].msg_content
+				valid_pics[data[i].id] = data[i].valid_pic
 
 				var list = {
 					id: data[i].id,
@@ -123,9 +140,15 @@ export default {
 						}
 				    },{
 				    	style: 'primary',
-				        text: '查看短信内容',
+				        text: '证件',
 				        onButtonClick: ( id ) => {
-
+							this.valid_pic = this.valid_pics[id]
+							this.pic_show = true
+						}
+				    },{
+				    	style: 'primary',
+				        text: '短信',
+				        onButtonClick: ( id ) => {
 							this.confirm_text = "短信内容"
 							this.toast_con = this.msg_contents[id]
 							this.toast_operate = false
@@ -138,6 +161,7 @@ export default {
 				lists.push( list )
 			}
 			this.msg_contents = msg_contents
+			this.valid_pics = valid_pics
 			this.lists = lists
 			this.pos_num = pos_num
 		})
@@ -152,7 +176,10 @@ export default {
 			pos_num: {},
 			toast_operate: true,
 			toast_con: "三思啊",
-			msg_contents: {}
+			msg_contents: {},
+			valid_pics: {},
+			pic_show: false,
+			valid_pic: ""
 		}
 	},
 	methods: {
@@ -227,5 +254,23 @@ export default {
 }
 .checker {
 	text-align: center;
+}
+.dialog-demo .weui-dialog{
+	border-radius: 8px;
+	padding-bottom: 8px;
+}
+.dialog-demo .dialog-title {
+	line-height: 30px;
+	color: #666;
+}
+.dialog-demo .img-box {
+	height: 350px;
+	overflow: hidden;
+}
+.dialog-demo .vux-close {
+	margin-top: 8px;
+	margin-bottom: 8px;
+	color: #0BB20C;
+	font-size: 12px;
 }
 </style>
