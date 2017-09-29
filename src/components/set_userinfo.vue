@@ -86,7 +86,7 @@ export default {
 	methods: {
 		submit: function () {
 			var data = {
-				email: this.$route.params.email,
+				email: this.$route.params.userinfo.email,
 				true_name : this.true_name,
 				gender : this.gender,
 				address : this.address,
@@ -95,6 +95,7 @@ export default {
 			this.show_load = true
 			var that = this
 			const url = "http://www.iimt.me/helpyou-server/sql_class/set_user_info.php?email="+data.email+"&true_name="+data.true_name+"&gender="+data.gender+"&tel="+data.tel+"&address="+data.address
+			console.log(url)
 			AjaxPlugin.$http.get( url ).then( (res) => {
 				console.log( res.data )
 				that.show_load = false
@@ -105,15 +106,17 @@ export default {
 				that.toast_show = true
 			})
 			//上传身份照片
-			console.log("上传照片")
-			var files = this.$refs.files.files[0]
-			var form = new FormData()
-			form.append("file",files)
-			let id = this.$route.params.userinfo.stu_id
-			let upload_url = "http://www.iimt.me/helpyou-server/functions/upload_pic.php?id=" + id
-			AjaxPlugin.$http.post(upload_url, form).then( (res) => {
-				console.log(res.data)
-			})
+			if (this.file_input_state == "已选择"){
+				console.log("上传照片")
+				var files = this.$refs.files.files[0]
+				var form = new FormData()
+				form.append("file",files)
+				let id = this.$route.params.userinfo.stu_id
+				let upload_url = "http://www.iimt.me/helpyou-server/functions/upload_pic.php?id=" + id
+				AjaxPlugin.$http.post(upload_url, form).then( (res) => {
+					console.log(res.data)
+				})
+			}
 		},
 		change: function ( val ) {
 			this.gender = val
