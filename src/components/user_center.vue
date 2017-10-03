@@ -9,13 +9,14 @@
     	<divider class="divider">·</divider>
     	<group>
     		<cell title="设置个人信息" is-link @click.native="set_userinfo"></cell>
+    		
     		<cell title="退出" @click.native="logout"></cell>
     	</group>
+    	<group>
+    		<cell title="下载安卓版本" is-link @click.native="down_android"></cell>
+    	</group>
 		<div class="pay">
-			<img class="qrcode" src="../assets/weichat-pay.png">
-			<p>长按微信支付</p>
-			<p class="add">支付宝账号：17306566375</p>
-			<p class="add">其他问题：QQ1298793121</p>
+			<p class="add">技术支持：QQ1298793121</p>
     	</div>
 		<tabbar>
 			<tabbar-item :link='route_list'>
@@ -89,6 +90,10 @@ export default {
 			window.localStorage.islogin = false
 			console.log("退出")
 			this.$router.push("/")
+		},
+		down_android: function () {
+			console.log("下载安卓版本")
+			this.$router.push("/download")
 		}
 	}
 }

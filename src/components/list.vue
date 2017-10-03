@@ -33,13 +33,13 @@
 		</view-box>
 		<toast v-model="toast_show" :type="toast_type">{{ toast_content }}</toast>
 		<confirm v-model="show_confirm"
-	      :title="confirm_text"
-	      @on-cancel="onCancel"
-	      @on-confirm="onConfirm"
-	    >
-	        <p style="text-align:center;">三思啊</p>
-      </confirm>
-      <div v-transfer-dom>
+		  :title="confirm_text"
+		  @on-cancel="onCancel"
+		  @on-confirm="onConfirm"
+		>
+		    <p style="text-align:center;">三思啊</p>
+		</confirm>
+		<div v-transfer-dom>
 			<x-dialog v-model="pic_show" class="dialog-demo">
 				<div class="img-box">
 					<img src="../assets/pay.png" style="max-width:100%">

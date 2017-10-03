@@ -15,6 +15,7 @@ import set_userinfo from './components/set_userinfo'
 import admin from './components/tfhhh'
 import count from './components/count'
 import test from './components/test'
+import download from './components/android_down'
 
 Vue.use(VueRouter)
 Vue.use(AjaxPlugin)
@@ -58,6 +59,10 @@ const routes = [
 	{
 		path: '/test',
 		component: test
+	},
+	{
+		path: '/download',
+		component: download
 	}
 ]
 
