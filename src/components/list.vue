@@ -39,11 +39,22 @@
 	    >
 	        <p style="text-align:center;">三思啊</p>
       </confirm>
+      <div v-transfer-dom>
+			<x-dialog v-model="pic_show" class="dialog-demo">
+				<div class="img-box">
+					<img src="../assets/pay.png" style="max-width:100%">
+				</div>
+				<div @click="pic_show=false">
+					<span class="vux-close">关闭</span>
+				</div>
+			</x-dialog>
+		</div>
 	</div>
 </template>
 
 <script>
-import { Group, XInput, Tab, TabItem, XButton, Divider, XHeader, AjaxPlugin, Toast, Tabbar, TabbarItem, XTextarea, FormPreview, ViewBox, Confirm, Radio } from 'vux'
+import { Group, XInput, Tab, TabItem, XButton, Divider, XHeader, AjaxPlugin, Toast, Tabbar, TabbarItem, XTextarea, FormPreview, ViewBox, Confirm, Radio,
+	XDialog, TransferDomDirective as TransferDom} from 'vux'
 
 export default {
 	components: {
@@ -62,7 +73,11 @@ export default {
 	    FormPreview,
 	    ViewBox,
 	    Confirm,
-	    Radio
+	    Radio,
+	    XDialog
+	},
+	directives: {
+	    TransferDom
 	},
 	mounted() {
 		if( window.localStorage.islogin == "false" ){
@@ -113,6 +128,13 @@ export default {
 								this.cur_operate_id = id
 								this.opreate_type = "cancle"
 							}
+					    },{
+					    	style: 'paimary',
+					        text: '支付',
+					        onButtonClick: ( id ) => {
+								console.log( "支付" + id )
+								this.pic_show = true
+							}
 					    }]
 					}
 					lists.push( list )
@@ -148,10 +170,10 @@ export default {
 				value: "小件  (1元)"
 			},{
 				key: '中件',
-				value: "中件  (1.5元)"
+				value: "中件  (2元)"
 			},{
 				key: '大件',
-				value: '大件  (2元)'
+				value: '大件  (3元)'
 			}],
 			userinfo : {},
 			showdot : false,
@@ -167,6 +189,7 @@ export default {
 			toast_content: "成功",
 			toast_type: "success",
 			cur_operate_id: "",
+			pic_show: false
 		}
 	},
 	methods: {
@@ -244,5 +267,23 @@ export default {
 	#bottom {
 		position: fixed;
 		bottom: 0;
+	}
+	.dialog-demo .weui-dialog{
+		border-radius: 8px;
+		padding-bottom: 8px;
+	}
+	.dialog-demo .dialog-title {
+		line-height: 30px;
+		color: #666;
+	}
+	.dialog-demo .img-box {
+		height: 350px;
+		overflow: hidden;
+	}
+	.dialog-demo .vux-close {
+		margin-top: 8px;
+		margin-bottom: 8px;
+		color: #0BB20C;
+		font-size: 12px;
 	}
 </style>
